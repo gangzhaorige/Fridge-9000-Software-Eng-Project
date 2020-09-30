@@ -1,0 +1,80 @@
+{% extends 'refrigerator_project/base.html' %} {% load static %} {% block content %}
+
+<script>
+    (function (e, t, n) { var r = e.querySelectorAll("html")[0]; r.className = r.className.replace(/(^|\s)no-js(\s|$)/, "$1js$2") })(document, window, 0);
+</script>
+
+<div style="padding-top: 5px; background-color: white; outline: none; border-radius: 0%;">
+    <h3 class="text-center">Receipt Upload</h3>
+    {% if current_fridge %}
+    <p class="text-center" style="padding-bottom: 5px;">{{current_fridge.name}}</p>
+    {% else %}
+    <p class="text-center" style="color: #ff8080; padding-bottom: 5px;">No Refrigerators. Please Add One.</p>
+    {% endif %}
+</div>
+<div class="container" style="padding-bottom: 60px;">
+    {% if text %}
+    <div class="row">
+        <div class="col align-self-center">
+            <h5>Discovered Items From Receipt:</h5>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col">
+            <h4 style="text-align: center;">No items were discovered on your receipt.</h4>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <form method="post" enctype="multipart/form-data" action="{% url 'add_button' %}">
+            {% csrf_token %}
+            <label for="file" class="btn btn-info btn-block btn-rounded waves-effect" aria-pressed="true">
+                Upload Another Receipt
+            </label>
+            <input type="file" name="receipt_image" id="file" class="inputfile inputfile-5" accept="image/*"
+                onchange="this.form.submit()" />
+        </form>
+    </div>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <a href="{% url 'fridge' %}">Return to Fridge</a>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Form for list of found items -->
+    <form method="POST" id="receipt_selection">
+        {% csrf_token %}
+        <div class="container" style="color:initial;">
+            {% for each in text %}
+            <div class="card" style="height: 4rem; color: black; background-color: #f2f2f2;">
+                <label>
+                    <div class="card-body">
+                        <input type="checkbox" style="float:right;" name="selected_items" value="{{ each }}">
+                        <h5 class="card-title">
+                            {% with image_static='/item_icons/'|add:each|add:'.png' %}
+                            <img src="{% static image_static %}" alt="grocery_item" style="height: 30px;">
+                            {% endwith %}
+                            {{ each }}
+                        </h5>
+                    </div>
+                </label>
+            </div>
+            <div style="padding-top: 4px;"></div>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+
+{% if text %}
+<!-- Submit Button-->
+<div class="container fixed-bottom" style="padding-bottom: 60px; z-index: 0;">
+    <div class="row">
+        <div class="col" style="text-align: center;">
+            <button form="receipt_selection" class="btn btn-lg btn-info" name="validate_items" type="submit"
+                style="width: 75%;" value="selection">Add Items</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

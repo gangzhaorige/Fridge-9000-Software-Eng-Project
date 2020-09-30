@@ -1,0 +1,90 @@
+{% extends 'refrigerator_project/base.html' %} {% load static %} {% block content %}
+
+<script>
+    function search(input, ul) {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById(input);
+        filter = input.value.toUpperCase();
+        ul = document.getElementById(ul);
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+            txtValue = li[i].id
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+<div style="padding-top: 5px; background-color: white; outline: none; border-radius: 0%;">
+    <h3 class="text-center">Recipe Search</h3>
+    {% if current_fridge %}
+    <p class="text-center" style="padding-bottom: 5px;">{{current_fridge.name}}</p>
+    {% else %}
+    <p class="text-center" style="color: #ff8080; padding-bottom: 5px;">No Refrigerators. Please Add One.</p>
+    {% endif %}
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h4 class="text-center">Select items you'd like to use:</h4>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px;">
+        <div class="col">
+            <!-- Search For Items -->
+            <div class="container">
+                <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4">
+                    <div class="input-group">
+                        <input type="text" id="ingredient_input" onkeyup="search('ingredient_input', 'ingredient_ul')"
+                            placeholder="Item Name" aria-describedby="button-addon1"
+                            class="form-control border-0 bg-light">
+                        <div class="input-group-append">
+                            <button id="button-addon1" type="submit" class="btn btn-link text-info"><i
+                                    class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <hr size="3" width="100%" color="gray">
+                <h5>Current Fridge Contents:</h5>
+            </div>
+            <!-- List of Items -->
+            <form id="ingredient_form" action="{% url 'recipe_search_results' %}" method="GET">
+                <ul class="container-fluid" id="ingredient_ul">
+                    {% for each in inventory_items %}
+                    <li id="{{each.item.name}}" style="padding-top: 4px;">
+                        <div class="card" x style="height: 4.3em; background-color: #f2f2f2;">
+                            <label>
+                                <div class="card-body">
+                                    <input type="checkbox" style="float:right;" name="ingredient"
+                                        value="{{ each.item.name }}" id="heading">
+                                    <h5 class="card-title">
+                                        {% with image_static='/item_icons/'|add:each.item.name|add:'.png' %}
+                                        <img src="{% static image_static %}" alt="tracked_item" style="height: 30px;">
+                                        {% endwith %}
+                                        {{ each.item.name }}
+                                    </h5>
+                                </div>
+                            </label>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Submit Button-->
+<div class="container fixed-bottom" style="padding-bottom: 60px; z-index: 0;">
+    <div class="row">
+        <div class="col" style="text-align: right;">
+            <button form="ingredient_form" class="btn btn-info" name="next" type="submit" style="width: 40%;"
+                {% if not current_fridge %} disabled {% endif %}>Next</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

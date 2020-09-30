@@ -1,0 +1,58 @@
+{% extends 'refrigerator_project/base.html' %} {% load static %} {% block content %}
+
+<div style="padding-top: 5px; background-color: white; outline: none; border-radius: 0%;">
+    <h3 class="text-center">Recipes</h3>
+    {% if current_fridge %}
+    <p class="text-center" style="padding-bottom: 5px;">{{current_fridge.name}}</p>
+    {% else %}
+    <p class="text-center" style="color: #ff8080; padding-bottom: 5px;">No Refrigerators. Please Add One.</p>
+    {% endif %}
+</div>
+<div class="container">
+    <div class="row row d-flex justify-content-center" style="padding-top: 5px;">
+        <div style="width: 70%;">
+            <a {% if current_fridge %} href="{% url 'recipe_search' %}" class="btn btn-info btn-lg btn-block" {% else %}
+                class="btn btn-info btn-lg btn-block disabled" {% endif %} class="btn btn-info btn-lg btn-block"
+                role="button" aria-pressed="true">Find Recipes</a>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px;">
+        <hr size="6" width="100%" color="black">
+        <div class="col">
+            <h5>Saved Recipes:</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <!-- Display All Saved Recipes for Selected Fridge -->
+            {% if saved_recipes %} {% for each in saved_recipes %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-text">
+                                <!--img src="{{ each.imageurl }}" alt="recipe_img" style="height: 50px;"-->
+                                <a class="vertical-center" style="padding-left: 20px;" href="{{ each.sourceurl }}">
+                                    {{ each.title }}
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="col-2">
+                            <form method="POST" class="all-center">
+                                {% csrf_token %}
+                                <button class="far fa-trash-alt fa-lg btn" type="submit" name="delete_recipe"
+                                    value={{each.id}}></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top: 4px;"></div>
+            {% endfor %} {% else %}
+            <p>none</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
